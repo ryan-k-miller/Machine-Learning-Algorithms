@@ -1,2 +1,2 @@
 # Machine-Learning-Algorithms
-Recreation of popular machine learning algorithms
+Implementation of popular machine learning algorithms
