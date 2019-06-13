@@ -81,8 +81,8 @@ class LogisticRegression:
             db = (1/m)*np.sum(dZ)
             #updating weights and intercept
             t = self.adaptive_step_size(X_std, w, b, dw, db, t, y)
-            w -= self.alpha*dw
-            b -= self.alpha*db
+            w -= t*dw
+            b -= t*db
             #appending current cost
             J.append(self.cost(A,y))
             #exiting loop upon convergence
@@ -106,7 +106,7 @@ class LogisticRegression:
 
 
 #testing LogisticRegression class
-data = pd.read_csv("Data/Binary Classification/diabetes.csv",header=0)
+data = pd.read_csv("../Data/Binary Classification/diabetes.csv",header=0)
 X = data.iloc[:,:-1]
 y = data.iloc[:,-1].ravel()
 lr = LogisticRegression(alpha=0.1,max_iter=200,standardize=True,random_state=0)
@@ -117,7 +117,7 @@ print(lr.w,lr.b)
 print("Number of Iterations until Convergence for Gradient Descent:",len(lr.J))
 
 #comparing to sklearn's implementation
-sklearn_lr = sklr(fit_intercept=True,solver='lbfgs',penalty='none',max_iter=200, random_state=0)
+sklearn_lr = sklr(fit_intercept=True,solver='lbfgs',max_iter=200, random_state=0)
 sklearn_lr.fit(X,y)
 print("Prediction Accuracy for Sklearn:",np.round(100*sklearn_lr.score(X,y),3),'%')
 print(sklearn_lr.coef_,sklearn_lr.intercept_)
