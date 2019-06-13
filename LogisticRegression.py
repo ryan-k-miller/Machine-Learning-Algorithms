@@ -126,7 +126,7 @@ print("Number of Iterations until Convergence for Sklearn:",sklearn_lr.n_iter_[0
 # #plotting cost across iterations
 gd_likelihoods = np.array(lr.J).reshape((-1))
 plt.plot(gd_likelihoods)
-plt.ylabel("Likelihood")
+plt.ylabel("Cost")
 plt.xlabel("Iterations")
-plt.title("Likelihood of Betas during Gradient Descent")
+plt.title("Cost over Training Iterations")
 plt.show()
