@@ -54,7 +54,6 @@ class LogisticRegression:
             A = A_new
             Z_new = np.dot(X_std,(w - t*dw).T) + b - t*db
             A_new = self.sigmoid(Z_new)
-
         return t
 
     #method to train the model using the inputted features and response var
