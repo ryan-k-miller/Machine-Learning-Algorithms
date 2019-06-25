@@ -27,11 +27,13 @@ class NeuralNetwork:
         cost = np.squeeze(cost)
         return cost
 
+    #initializing the parameters W and b using He's implementation
+    #because we're using ReLU for our hidden layers
     def initialize_parameters(self,layer_dims):
         np.random.seed(3)
         parameters = {}
         for l in range(1, len(layer_dims)):
-            parameters['W' + str(l)] = np.random.randn(layer_dims[l], layer_dims[l-1]) / np.sqrt(layer_dims[l-1]) #*0.01
+            parameters['W' + str(l)] = (np.random.randn(layer_dims[l], layer_dims[l-1])*2) / np.sqrt(layer_dims[l-1]) #*0.01
             parameters['b' + str(l)] = np.zeros((layer_dims[l],1))
         return parameters
 
