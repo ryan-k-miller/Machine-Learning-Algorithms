@@ -103,29 +103,29 @@ class LogisticRegression:
 
 
 
+if __name__ == "__main__":
+    #testing LogisticRegression class
+    data = pd.read_csv("../Data/Binary Classification/diabetes.csv",header=0)
+    X = data.iloc[:,:-1]
+    y = data.iloc[:,-1].ravel()
+    lr = LogisticRegression(alpha=0.1,max_iter=200,standardize=True,random_state=0)
+    lr.train(X, y)
 
-#testing LogisticRegression class
-data = pd.read_csv("../Data/Binary Classification/diabetes.csv",header=0)
-X = data.iloc[:,:-1]
-y = data.iloc[:,-1].ravel()
-lr = LogisticRegression(alpha=0.1,max_iter=200,standardize=True,random_state=0)
-lr.train(X, y)
+    print("Prediction Accuracy for Gradient Descent:",np.round(lr.accuracy(X,y),3),'%')
+    print(lr.w,lr.b)
+    print("Number of Iterations until Convergence for Gradient Descent:",len(lr.J))
 
-print("Prediction Accuracy for Gradient Descent:",np.round(lr.accuracy(X,y),3),'%')
-print(lr.w,lr.b)
-print("Number of Iterations until Convergence for Gradient Descent:",len(lr.J))
+    #comparing to sklearn's implementation
+    sklearn_lr = sklr(fit_intercept=True,solver='lbfgs',max_iter=200, random_state=0)
+    sklearn_lr.fit(X,y)
+    print("Prediction Accuracy for Sklearn:",np.round(100*sklearn_lr.score(X,y),3),'%')
+    print(sklearn_lr.coef_,sklearn_lr.intercept_)
+    print("Number of Iterations until Convergence for Sklearn:",sklearn_lr.n_iter_[0])
 
-#comparing to sklearn's implementation
-sklearn_lr = sklr(fit_intercept=True,solver='lbfgs',max_iter=200, random_state=0)
-sklearn_lr.fit(X,y)
-print("Prediction Accuracy for Sklearn:",np.round(100*sklearn_lr.score(X,y),3),'%')
-print(sklearn_lr.coef_,sklearn_lr.intercept_)
-print("Number of Iterations until Convergence for Sklearn:",sklearn_lr.n_iter_[0])
-
-# #plotting cost across iterations
-gd_likelihoods = np.array(lr.J).reshape((-1))
-plt.plot(gd_likelihoods)
-plt.ylabel("Cost")
-plt.xlabel("Iterations")
-plt.title("Cost over Training Iterations")
-plt.show()
+    # #plotting cost across iterations
+    gd_likelihoods = np.array(lr.J).reshape((-1))
+    plt.plot(gd_likelihoods)
+    plt.ylabel("Cost")
+    plt.xlabel("Iterations")
+    plt.title("Cost over Training Iterations")
+    plt.show()
