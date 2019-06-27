@@ -20,7 +20,7 @@ class NeuralNetwork:
         self.random_state = random_state
         self.print_errors = print_errors
         self.L = len(layer_dims)
-        #checking
+        
 
     #computing logloss of current output layer activations to track progress of training
     def cost(self, AL, Y):
