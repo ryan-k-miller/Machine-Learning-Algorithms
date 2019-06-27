@@ -28,7 +28,6 @@ class NeuralNetwork:
         return cost
 
     #initializing the parameters W and b using He's implementation
-    #because we're using ReLU for our hidden layers
     def initialize_parameters(self,layer_dims):
         np.random.seed(3)
         parameters = {}
@@ -37,39 +36,28 @@ class NeuralNetwork:
             parameters['b' + str(l)] = np.zeros((layer_dims[l],1))
         return parameters
 
-    #method for updating model parameters
+    #method for updating model parameters for all layers
     def update_parameters(self, parameters, grads):
-        #updating parameters for each layer
         for l in range(1,self.L+1):
             parameters["W" + str(l)] -= self.alpha*grads["dW" + str(l)]
             parameters["b" + str(l)] -= self.alpha*grads["db" + str(l)]
-            # print(l,'dW nonzero count:',np.count_nonzero(grads["dW" + str(l)]))
         return parameters
 
     #method to train the model using the inputted features and response var
     def train(self, X, Y):
-        # keep track of training cost and accuracy
+        #initializing lists for tracking training cost ovre training iterations
         costs = []
-        acc = []
-        #storing layer dimensions (number of observations, number of hidden nodes,
-        #number of output nodes) and number of layers
+        #storing layer dimensions and number of layers
         self.layer_dims.insert(0,X.shape[0])
-        print("train L:",self.L)
-        #initializing parameters
+        #training the NN with forward and back propagation
         self.parameters = self.initialize_parameters(self.layer_dims)
-        #looping until convergence (max_iter reached)
         for i in range(0, self.max_iter):
-            #performing forward propagation
             AL, caches = forwardprop(X, self.parameters, self.L)
-            #performing backpropagation.
             grads = backprop(AL, Y, caches, self.L)
-            #updating parameters
             self.parameters = self.update_parameters(self.parameters, grads)
+            #storing and outputing logloss for every 100 iterations
             if i % 100 == 0:
-                #storing training cost and accuracy
                 costs.append(self.cost(AL, Y))
-                # print("mean AL:",np.mean(AL))
-                #printing current logloss based on hyperparameters
                 if self.print_errors:
                     print ("Logloss after iteration %i: %f" %(i, costs[-1]))
         self.costs = costs
@@ -84,13 +72,11 @@ class NeuralNetwork:
 
     #method for predicting using learned update_parameters
     def predict(self,X):
-        #making predictions using current parameters
         pred_prob,_ = forwardprop(X, self.parameters, self.L)
         pred = (pred_prob)
         return pred
 
     #finds the prediction accuracy of the current weights and intercept
     def accuracy(self, X, Y):
-        #making predictions
         pred = self.predict(X)
         return 100*np.mean(np.round(pred) == Y)
