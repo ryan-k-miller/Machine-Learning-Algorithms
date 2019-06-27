@@ -36,11 +36,11 @@ class NeuralNetwork:
         #storing layer dimensions and number of layers
         self.layer_dims.insert(0,X.shape[0])
         #training the NN with forward and back propagation
-        self.parameters = self.initialize_parameters(self.layer_dims)
+        self.parameters = initialize_parameters(self.layer_dims)
         for i in range(0, self.max_iter):
             AL, caches = forwardprop(X, self.parameters, self.L)
             grads = backprop(AL, Y, caches, self.L)
-            self.parameters = self.update_parameters(self.parameters, grads)
+            self.parameters = update_parameters(self.parameters, grads)
             #storing and outputing logloss for every 100 iterations
             if i % 100 == 0:
                 costs.append(self.cost(AL, Y))
