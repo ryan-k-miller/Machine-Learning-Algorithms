@@ -4,6 +4,7 @@ from forwardprop import *
 from backprop import *
 from sklearn.preprocessing import normalize
 import matplotlib.pyplot as plt
+import pandas as pd
 
 class NeuralNetwork:
     """
@@ -19,6 +20,7 @@ class NeuralNetwork:
         self.random_state = random_state
         self.print_errors = print_errors
         self.L = len(layer_dims)
+        #checking
 
     #computing logloss of current output layer activations to track progress of training
     def cost(self, AL, Y):
@@ -27,12 +29,24 @@ class NeuralNetwork:
         cost = np.squeeze(cost)
         return cost
 
-    #initializing the parameters W and b using He's implementation
-    def initialize_parameters(self,layer_dims):
+    def initialize_parameters(self,layer_dims, init_strategy = 'Xavier'):
+        """
+            initializing the weights and intercepts of the neural network
+            inputs:
+                layers_dims: list containing the number of neurons in each layer
+                init_strategy: takes either 'He' or 'Xavier'
+                               chooses the initialization strategy for the weights
+            output:
+                parameters: dictionary containing the weights and intercepts for each layer
+        """
         np.random.seed(3)
         parameters = {}
+        if init_strategy == 'He':
+            init_multiplier = 2
+        elif init_strategy == 'Xavier':
+            init_multiplier = 1
         for l in range(1, len(layer_dims)):
-            parameters['W' + str(l)] = (np.random.randn(layer_dims[l], layer_dims[l-1])*2) / np.sqrt(layer_dims[l-1]) #*0.01
+            parameters['W' + str(l)] = (np.random.randn(layer_dims[l], layer_dims[l-1])) * init_multiplier/ np.sqrt(layer_dims[l-1]) #*0.01
             parameters['b' + str(l)] = np.zeros((layer_dims[l],1))
         return parameters
 
@@ -80,3 +94,18 @@ class NeuralNetwork:
     def accuracy(self, X, Y):
         pred = self.predict(X)
         return 100*np.mean(np.round(pred) == Y)
+
+
+if __name__ == "__main__":
+    #testing NeuralNetwork class using Diabetes dataset
+    data = pd.read_csv("../../../Coding/diabetes.csv",header=0)
+    #shaping the data so the examples are stored in column vectors
+    X = np.array(data.iloc[:,:-1]).T
+    Y = data.iloc[:,-1].ravel().reshape((1,-1))
+
+    #initializing, training, and evaluating the nn
+    nn = NeuralNetwork(alpha=0.01,max_iter=500,layer_dims=[20, 20, 10, 1],random_state=1)
+    nn.train(X, Y)
+    nn.plot_cost()
+
+    print("Prediction Accuracy for Neural Network:",np.round(nn.accuracy(X,Y),3),'%')
