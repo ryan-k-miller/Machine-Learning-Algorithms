@@ -29,7 +29,6 @@ class NeuralNetwork:
         output:
             None
     """
-    #initializing object and defining hyper-parameters for the model
     def __init__(self, layer_dims=[4,4,4], alpha=0.01, epochs=1000,
                  init_strategy="Xavier",decay_rate=0.001, mini_batch_size=64,
                  epsilon=10**-8, random_state=0, print_errors=True):
@@ -51,7 +50,6 @@ class NeuralNetwork:
         cost = np.squeeze(cost)
         return cost
 
-    #method to train the model using the inputted features and response var
     def train(self, X, Y):
         """
             method for training the Neural Network based on the hyperparameters
@@ -68,19 +66,24 @@ class NeuralNetwork:
 
             output:
                 None
-
         """
         self.costs = []
         #storing input and output layer dimensions
         m = X.shape[1]
         self.layer_dims.insert(0,X.shape[0])
-        self.layer_dims.append(1)  #only doing binary classification
-        #self.layer_dims.append(len(set(Y)))  #for multiclass classification
-        alpha = self.alpha
+        multiclass = len(np.unique(Y)) > 2
+        if multiclass:
+            self.layer_dims.append(len(set(Y)))  #for multiclass classification
+        else:
+            self.layer_dims.append(1)  #only doing binary classification
         num_complete_mb,incomp_mb_size = mini_batch_setup(m,self.mini_batch_size)
+        #printing descriptions of the training architecture
+        print("Multiclass Classification:",multiclass)
+        print("Number of Layers",len(self.layer_dims))
         print("Number of Mini-Batches",num_complete_mb + (incomp_mb_size > 0))
         #training the NN with forward and back propagation
-        self.parameters = initialize_parameters(self.layer_dims)
+        alpha = self.alpha
+        self.parameters = initialize_parameters(self.layer_dims, init_strategy=self.init_strategy)
         for i in range(0, self.epochs):
             alpha = self.alpha/(1+self.decay_rate*i)
             for t in range(num_complete_mb):
@@ -163,9 +166,9 @@ if __name__ == "__main__":
     print("Shape of Training Data:",X.shape)
     #initializing, training, and evaluating the nn
     nn = NeuralNetwork(alpha=0.001,epochs=5000,layer_dims=[20, 20, 10, 10],
-                       decay_rate=0.001, mini_batch_size=X.shape[1]/5, init_strategy = "Xavier",
+                       decay_rate=0.001, mini_batch_size=X.shape[1]/5, init_strategy = "test",
                        random_state=0, print_errors=False)
     nn.train(X, Y)
-    nn.plot_cost()
+    # nn.plot_cost()
 
     print("Prediction Accuracy for Neural Network:",np.round(nn.accuracy(X,Y),3),'%')

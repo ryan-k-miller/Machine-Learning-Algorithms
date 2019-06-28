@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 def initialize_parameters(layer_dims, init_strategy = 'xavier', random_state = 0):
     """
@@ -19,8 +20,11 @@ def initialize_parameters(layer_dims, init_strategy = 'xavier', random_state = 0
         init_multiplier = 2
     elif init_strategy == 'xavier':
         init_multiplier = 1
+    else:
+        print("Wrong value for init_strategy: choose either He or Xavier initialization.")
+        sys.exit(1)
     for l in range(1, len(layer_dims)):
-        parameters['W' + str(l)] = (np.random.randn(layer_dims[l], layer_dims[l-1])) * init_multiplier/ np.sqrt(layer_dims[l-1]) #*0.01
+        parameters['W' + str(l)] = (np.random.randn(layer_dims[l], layer_dims[l-1])) * init_multiplier/ np.sqrt(layer_dims[l-1])
         parameters['b' + str(l)] = np.zeros((layer_dims[l],1))
     return parameters
 
@@ -28,9 +32,11 @@ def initialize_parameters(layer_dims, init_strategy = 'xavier', random_state = 0
 def update_parameters(parameters, grads, alpha, L):
     """
         updating parameters based on the gradients derived during backprop
+
         inputs:
             parameters: dictionary containing the current weights and intercepts for each layer
             grads: dictionary containing the gradients of the weights and intercepts for each layer
+
         output:
             parameters: dictionary containing the updated weights and intercepts for each layer
     """
