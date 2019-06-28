@@ -143,8 +143,6 @@ class NeuralNetwork:
                 accuracy: float representing the accuracy of the current parameters
         """
         pred = self.predict(X)
-        print("Y squeeze shape",np.squeeze(Y).shape)
-        print(np.squeeze(pred).shape)
         return 100*np.mean(np.round(np.squeeze(pred)) == np.squeeze(Y))
 
     def plot_cost(self):
@@ -171,18 +169,20 @@ if __name__ == "__main__":
     # #shaping the data so the examples are stored in column vectors
     # X = np.array(data.iloc[:,:-1]).T
     # Y = data.iloc[:,-1].ravel().reshape((1,-1))
-    # print("Shape of Training Data:",X.shape)
 
     #testing NeuralNetwork class using Diabetes dataset
     data = pd.read_csv("../../../Coding/mnist_train.csv",header=0)
     #shaping the data so the examples are stored in column vectors
-    X = np.array(data.iloc[:,1:]).T
-    Y = data.iloc[:,0].ravel().reshape((1,-1))
+    m = 20000
+    X_train = np.array(data.iloc[:m,1:]).T / 255
+    Y_train = pd.get_dummies(data.iloc[:m,0]).values.T
+    X_test = np.array(data.iloc[-5000:,1:]).T / 255
+    Y_test = pd.get_dummies(data.iloc[-5000:,0]).values.T
     #initializing, training, and evaluating the nn
-    nn = NeuralNetwork(alpha=0.001,epochs=10,layer_dims=[10, 10, 10],
-                       decay_rate=0.001, mini_batch_size=X.shape[1]/10000, init_strategy = "Xavier",
+    nn = NeuralNetwork(alpha=0.1,epochs=100,layer_dims=[20, 20, 10],
+                       decay_rate=0.001, mini_batch_size=X_train.shape[1]/200, init_strategy = "Xavier",
                        random_state=0, print_errors=True)
-    nn.train(X, Y)
-    # nn.plot_cost()
+    nn.train(X_train, Y_train)
+    nn.plot_cost()
 
-    print("Prediction Accuracy for Neural Network:",np.round(nn.accuracy(X[:,:1000],Y[:,:1000]),3),'%')
+    print("Prediction Accuracy for Neural Network:",np.round(nn.accuracy(X_test,Y_test),3),'%')
