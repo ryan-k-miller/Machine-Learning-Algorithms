@@ -12,6 +12,7 @@ class NeuralNetwork:
         this class is for training, predicting, and evaluating an L-depth
         Neural Network for binary classification using linear ReLU hidden nodes
         and a linear Sigmoid output node
+
         inputs:
             layer_dims: list containing the number of neurons for each hidden layer
             alpha: float representing the learning rate of the model
@@ -24,6 +25,7 @@ class NeuralNetwork:
             epsilon: float representing the adjustment value to avoid numerical instability (divide by 0)
             random_state: int for setting the np.random.seed to ensure reproducibility
             print_errors: boolean flag representing whether or not to print the cost during training
+
         output:
             None
     """
@@ -54,11 +56,18 @@ class NeuralNetwork:
         """
             method for training the Neural Network based on the hyperparameters
             selected during initialization
+
+            parameters and training costs are stored as attributes of the class
+
             inputs:
                 X: numpy array containing the training examples as column vectors
                     X.shape(num_features , num_examples)
                 Y: numpy array containing the training labels as column vectors
                     Y.shape(num_categories , num_examples)
+
+            output:
+                None
+
         """
         self.costs = []
         #storing input and output layer dimensions

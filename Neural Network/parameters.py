@@ -3,11 +3,13 @@ import numpy as np
 def initialize_parameters(layer_dims, init_strategy = 'xavier', random_state = 0):
     """
         initializing the weights and intercepts of the neural network
+
         inputs:
             layers_dims: list containing the number of neurons in each layer
             init_strategy: takes either 'He' or 'Xavier'
                            chooses the initialization strategy for the weights
            random_state: value for setting the random state
+
         output:
             parameters: dictionary containing the initialized weights and intercepts for each layer
     """
