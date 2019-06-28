@@ -19,11 +19,11 @@ class NeuralNetwork:
                  epsilon=10**-8, random_state=0, print_errors=True):
         self.layer_dims = layer_dims
         self.alpha = alpha
-        self.epochs = epochs
-        self.random_state = random_state
+        self.epochs = int(epochs)
+        self.random_state = int(random_state)
         self.print_errors = print_errors
         self.L = len(layer_dims)
-        self.init_strategy = init_strategy
+        self.init_strategy = init_strategy.lower()
         self.decay_rate = decay_rate
         self.mini_batch_size = int(mini_batch_size)
         self.epsilon = epsilon
@@ -99,8 +99,8 @@ if __name__ == "__main__":
     Y = data.iloc[:,-1].ravel().reshape((1,-1))
     print("Shape of Training Data:",X.shape)
     #initializing, training, and evaluating the nn
-    nn = NeuralNetwork(alpha=0.001,epochs=500,layer_dims=[20, 20, 20, 10],
-                       decay_rate=0.001, mini_batch_size=X.shape[1]/10, init_strategy = "He",
+    nn = NeuralNetwork(alpha=0.001,epochs=5000,layer_dims=[20, 20, 10, 10],
+                       decay_rate=0.001, mini_batch_size=X.shape[1]/5, init_strategy = "Xavier",
                        random_state=0, print_errors=False)
     nn.train(X, Y)
     nn.plot_cost()

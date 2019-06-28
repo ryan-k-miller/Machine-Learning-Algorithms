@@ -1,17 +1,7 @@
 import numpy as np
-#sigmoid method for computing activations during training
-def sigmoid(Z):
-    s = 1/(1 + np.exp(-1 * Z))
-    return s , Z
-
-#ReLU method for computing activations during training
-def relu(Z):
-    r = np.maximum(0,Z)
-    return r , Z
+from activation import *
 
 def forwardprop_helper(A_prev, W, b, activation):
-    #dictionary for selecting activation function
-    activation_funcs = {'sigmoid':sigmoid, 'relu':relu}
     #finding activation function
     activation_func = activation_funcs[activation]
     #computing Z and linear_cache for backprop

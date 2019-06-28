@@ -1,6 +1,6 @@
 import numpy as np
 
-def initialize_parameters(layer_dims, init_strategy = 'Xavier', random_state = 0):
+def initialize_parameters(layer_dims, init_strategy = 'xavier', random_state = 0):
     """
         initializing the weights and intercepts of the neural network
         inputs:
@@ -13,9 +13,9 @@ def initialize_parameters(layer_dims, init_strategy = 'Xavier', random_state = 0
     """
     np.random.seed(random_state)
     parameters = {}
-    if init_strategy == 'He':
+    if init_strategy == 'he':
         init_multiplier = 2
-    elif init_strategy == 'Xavier':
+    elif init_strategy == 'xavier':
         init_multiplier = 1
     for l in range(1, len(layer_dims)):
         parameters['W' + str(l)] = (np.random.randn(layer_dims[l], layer_dims[l-1])) * init_multiplier/ np.sqrt(layer_dims[l-1]) #*0.01
