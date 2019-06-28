@@ -71,14 +71,15 @@ class NeuralNetwork:
         #storing input and output layer dimensions
         m = X.shape[1]
         self.layer_dims.insert(0,X.shape[0])
-        multiclass = len(np.unique(Y)) > 2
-        if multiclass:
-            self.layer_dims.append(len(set(Y)))  #for multiclass classification
+        self.num_classes = len(np.unique(Y))
+        if self.num_classes > 2:
+            self.layer_dims.append(self.num_classes)  #for multiclass classification
         else:
             self.layer_dims.append(1)  #only doing binary classification
         num_complete_mb,incomp_mb_size = mini_batch_setup(m,self.mini_batch_size)
         #printing descriptions of the training architecture
-        print("Multiclass Classification:",multiclass)
+        print("Shape of Training Data:",X.shape)
+        print("Number of Classes:",self.num_classes)
         print("Number of Layers",len(self.layer_dims))
         print("Number of Mini-Batches",num_complete_mb + (incomp_mb_size > 0))
         #training the NN with forward and back propagation
@@ -88,39 +89,25 @@ class NeuralNetwork:
             alpha = self.alpha/(1+self.decay_rate*i)
             for t in range(num_complete_mb):
                 X_batch = X[:,t*self.mini_batch_size:(t+1)*self.mini_batch_size]
+                X_batch = np.divide(X_batch, 255)
                 Y_batch = Y[:,t*self.mini_batch_size:(t+1)*self.mini_batch_size]
-                AL, caches = forwardprop(X_batch, self.parameters, self.L)
+                AL, caches = forwardprop(X_batch, self.parameters, self.L, self.num_classes)
                 grads = backprop(AL, Y_batch, caches, self.L)
                 self.parameters = update_parameters(self.parameters, grads, alpha, self.L)
                 #storing and outputing logloss for every 100 iterations
-                if (i*(num_complete_mb + (incomp_mb_size > 0)) + t + 1) % 100 == 0:
+                if (i*(num_complete_mb + (incomp_mb_size > 0)) + t + 1) % 1000 == 0:
                     self.costs.append(self.cost(AL, Y_batch))
                     if self.print_errors:
                         print ("Logloss after iteration %i: %f" %((i*(num_complete_mb + (incomp_mb_size > 0))) + t + 1, self.costs[-1]))
             #performing GD on incomplete mini-batch if exists
             if incomp_mb_size != 0:
                 X_batch = X[:,-incomp_mb_size:]
+                X_batch = np.divide(X_batch, 255)
                 Y_batch = Y[:,-incomp_mb_size:]
-                AL, caches = forwardprop(X_batch, self.parameters, self.L)
+                AL, caches = forwardprop(X_batch, self.parameters, self.L, self.num_classes)
                 grads = backprop(AL, Y_batch, caches, self.L)
                 self.parameters = update_parameters(self.parameters, grads, alpha, self.L)
                 alpha = self.alpha/(1+self.decay_rate*i)
-
-    def plot_cost(self):
-        """
-            method for plotting the training costs
-
-            input:
-                None
-
-            output:
-                None
-        """
-        plt.plot(np.squeeze(self.costs))
-        plt.ylabel('Logloss')
-        plt.xlabel('Iterations (per 100)')
-        plt.title("Learning rate =" + str(self.alpha))
-        plt.show()
 
     def predict(self,X):
         """
@@ -138,7 +125,10 @@ class NeuralNetwork:
                     if multiclass classification: pred_prob.shape == (num_classes , num_examples)
                     if binary classification: pred_prob.shape == (1 , num_examples)
         """
-        pred_prob,_ = forwardprop(X, self.parameters, self.L)
+        X = np.divide(X,255)
+        pred_prob,_ = forwardprop(X, self.parameters, self.L, self.num_classes)
+        if self.num_classes > 2:
+            pred_prob = np.argmax(pred_prob,axis=0)
         return pred_prob
 
     def accuracy(self, X, Y):
@@ -153,22 +143,46 @@ class NeuralNetwork:
                 accuracy: float representing the accuracy of the current parameters
         """
         pred = self.predict(X)
-        return 100*np.mean(np.round(pred) == Y)
+        print("Y squeeze shape",np.squeeze(Y).shape)
+        print(np.squeeze(pred).shape)
+        return 100*np.mean(np.round(np.squeeze(pred)) == np.squeeze(Y))
+
+    def plot_cost(self):
+        """
+        method for plotting the training costs
+
+        input:
+            None
+
+        output:
+            None
+        """
+        plt.plot(np.squeeze(self.costs))
+        plt.ylabel('Logloss')
+        plt.xlabel('Iterations (per 1000)')
+        plt.title("Learning rate =" + str(self.alpha))
+        plt.show()
 
 
 if __name__ == "__main__":
     import pandas as pd
     #testing NeuralNetwork class using Diabetes dataset
-    data = pd.read_csv("../../../Coding/diabetes.csv",header=0)
+    # data = pd.read_csv("../../../Coding/diabetes.csv",header=0)
+    # #shaping the data so the examples are stored in column vectors
+    # X = np.array(data.iloc[:,:-1]).T
+    # Y = data.iloc[:,-1].ravel().reshape((1,-1))
+    # print("Shape of Training Data:",X.shape)
+
+    #testing NeuralNetwork class using Diabetes dataset
+    data = pd.read_csv("../../../Coding/mnist_train.csv",header=0)
     #shaping the data so the examples are stored in column vectors
-    X = np.array(data.iloc[:,:-1]).T
-    Y = data.iloc[:,-1].ravel().reshape((1,-1))
-    print("Shape of Training Data:",X.shape)
+    X = np.array(data.iloc[:,1:]).T
+    Y = data.iloc[:,0].ravel().reshape((1,-1))
     #initializing, training, and evaluating the nn
-    nn = NeuralNetwork(alpha=0.001,epochs=5000,layer_dims=[20, 20, 10, 10],
-                       decay_rate=0.001, mini_batch_size=X.shape[1]/5, init_strategy = "test",
-                       random_state=0, print_errors=False)
+    nn = NeuralNetwork(alpha=0.001,epochs=10,layer_dims=[10, 10, 10],
+                       decay_rate=0.001, mini_batch_size=X.shape[1]/10000, init_strategy = "Xavier",
+                       random_state=0, print_errors=True)
     nn.train(X, Y)
     # nn.plot_cost()
 
-    print("Prediction Accuracy for Neural Network:",np.round(nn.accuracy(X,Y),3),'%')
+    print("Prediction Accuracy for Neural Network:",np.round(nn.accuracy(X[:,:1000],Y[:,:1000]),3),'%')

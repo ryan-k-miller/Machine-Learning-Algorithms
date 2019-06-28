@@ -11,7 +11,7 @@ def forwardprop_helper(A_prev, W, b, activation):
     cache = (linear_cache, activation_cache)
     return A, cache
 
-def forwardprop(X, parameters, L):
+def forwardprop(X, parameters, L, num_classes):
     """
         wrapper function for computing activations for each layer
 
@@ -33,6 +33,7 @@ def forwardprop(X, parameters, L):
         A, cache = forwardprop_helper(A_prev=A_prev,W=parameters['W' + str(l)],b=parameters['b' + str(l)],activation="relu")
         caches.append(cache)
     #computing activations for output layer
-    AL, cache = forwardprop_helper(A_prev=A,W=parameters['W' + str(L)],b=parameters['b' + str(L)],activation="sigmoid")
+    act = "softmax" if num_classes > 2 else "sigmoid"
+    AL, cache = forwardprop_helper(A_prev=A,W=parameters['W' + str(L)],b=parameters['b' + str(L)],activation=act)
     caches.append(cache)
     return AL, caches

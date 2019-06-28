@@ -31,5 +31,5 @@ def relu_gradient(dA, Z):
     return dZ
 
 #defining a dictionary containing the activation functions for forward prop and backprop
-activation_funcs = {'sigmoid':sigmoid, 'relu':relu}
+activation_funcs = {'sigmoid':sigmoid, 'relu':relu, 'softmax':softmax}
 gradient_funcs = {'sigmoid':sigmoid_gradient, 'relu':relu_gradient}
