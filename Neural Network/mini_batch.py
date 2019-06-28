@@ -1,6 +1,6 @@
 import numpy as np
 
-def mini_batch_setup(m,mini_batch_size):
+def mini_batch_setup(m, mini_batch_size):
     """
         function to determine the splits for mini-batch gradient descent
 

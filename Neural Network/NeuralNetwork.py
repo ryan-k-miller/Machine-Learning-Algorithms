@@ -61,9 +61,10 @@ class NeuralNetwork:
 
             inputs:
                 X: numpy array containing the training examples as column vectors
-                    X.shape(num_features , num_examples)
+                    X.shape == (num_features , num_examples)
                 Y: numpy array containing the training labels as column vectors
-                    Y.shape(num_categories , num_examples)
+                    if multiclass classification: Y.shape == (num_classes , num_examples)
+                    if binary classification: Y.shape == (1 , num_examples)
 
             output:
                 None
@@ -102,22 +103,52 @@ class NeuralNetwork:
                 self.parameters = update_parameters(self.parameters, grads, alpha, self.L)
                 alpha = self.alpha/(1+self.decay_rate*i)
 
-    #method for plotting cost over the training iterations
     def plot_cost(self):
+        """
+            method for plotting the training costs
+
+            input:
+                None
+
+            output:
+                None
+        """
         plt.plot(np.squeeze(self.costs))
         plt.ylabel('Logloss')
         plt.xlabel('Iterations (per 100)')
         plt.title("Learning rate =" + str(self.alpha))
         plt.show()
 
-    #method for predicting using learned update_parameters
     def predict(self,X):
-        pred_prob,_ = forwardprop(X, self.parameters, self.L)
-        pred = (pred_prob)
-        return pred
+        """
+            method for predicting using learned parameters
 
-    #finds the prediction accuracy of the current weights and intercept
+            input:
+                X: numpy array containing the examples as column vectors for prediction
+                    X.shape == (num_features , num_examples)
+                Y: numpy array containing the training labels as column vectors
+                    if multiclass classification: Y.shape == (num_classes , num_examples)
+                    if binary classification: Y.shape == (1 , num_examples)
+
+            output:
+                pred_prob: numpy array containing the predicted probabilities for each example
+                    if multiclass classification: pred_prob.shape == (num_classes , num_examples)
+                    if binary classification: pred_prob.shape == (1 , num_examples)
+        """
+        pred_prob,_ = forwardprop(X, self.parameters, self.L)
+        return pred_prob
+
     def accuracy(self, X, Y):
+        """
+            method for finding the accuracy of the current parameters
+
+            input:
+                X: numpy array containing the examples as column vectors for prediction
+                    X.shape == (num_features , num_examples)
+
+            output:
+                accuracy: float representing the accuracy of the current parameters
+        """
         pred = self.predict(X)
         return 100*np.mean(np.round(pred) == Y)
 

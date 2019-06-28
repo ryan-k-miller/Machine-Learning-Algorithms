@@ -35,7 +35,9 @@ def backprop(AL, Y, caches, L):
 
         inputs:
             AL: numpy array containing the activations of the output layer
-            Y: numpy array containing the training labels
+            Y: numpy array containing the training labels as column vectors
+                if multiclass classification: Y.shape == (num_classes , num_examples)
+                if binary classification: Y.shape == (1 , num_examples)
             caches: list containing the forward prop caches for each layer
             L: int representing the number of layers
 
