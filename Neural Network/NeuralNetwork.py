@@ -12,6 +12,20 @@ class NeuralNetwork:
         this class is for training, predicting, and evaluating an L-depth
         Neural Network for binary classification using linear ReLU hidden nodes
         and a linear Sigmoid output node
+        inputs:
+            layer_dims: list containing the number of neurons for each hidden layer
+            alpha: float representing the learning rate of the model
+            epochs: int representing the number of training epochs
+            init_strategy: string representing the parameter initialization strategy
+                           takes the value of "xavier" or "he"
+            decay_rate: float representing the decay rate for learning rate decay
+            mini_batch_size: int representing the size of each mini-batch
+                             if mini_batch_size == num_examples, then performing batch gradient descent
+            epsilon: float representing the adjustment value to avoid numerical instability (divide by 0)
+            random_state: int for setting the np.random.seed to ensure reproducibility
+            print_errors: boolean flag representing whether or not to print the cost during training
+        output:
+            None
     """
     #initializing object and defining hyper-parameters for the model
     def __init__(self, layer_dims=[4,4,4], alpha=0.01, epochs=1000,
@@ -37,6 +51,15 @@ class NeuralNetwork:
 
     #method to train the model using the inputted features and response var
     def train(self, X, Y):
+        """
+            method for training the Neural Network based on the hyperparameters
+            selected during initialization
+            inputs:
+                X: numpy array containing the training examples as column vectors
+                    X.shape(num_features , num_examples)
+                Y: numpy array containing the training labels as column vectors
+                    Y.shape(num_categories , num_examples)
+        """
         self.costs = []
         #storing input and output layer dimensions
         m = X.shape[1]

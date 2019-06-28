@@ -29,8 +29,17 @@ def backprop_hidden(dA, cache,activation="relu"):
     dZ = gradient_func(dA,activation_cache)
     return backprop_helper(dZ,linear_cache)
 
-#function for performing backpropagation
 def backprop(AL, Y, caches, L):
+    """
+        wrapper function for computing gradients of the cost function for each layer
+        inputs:
+            AL: numpy array containing the activations of the output layer
+            Y: numpy array containing the training labels
+            caches: list containing the forward prop caches for each layer
+            L: int representing the number of layers
+        output:
+            grads: dictionary containing the gradients for each layer
+    """
     grads = {}
     current_cache = caches[-1]
     #finding the gradients of the parameters for the output layer
