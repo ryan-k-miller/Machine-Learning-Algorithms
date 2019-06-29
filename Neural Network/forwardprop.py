@@ -1,8 +1,7 @@
 import numpy as np
 from activation import *
 
-def forwardprop_helper(A_prev, W, b, activation):
-    activation_func = activation_funcs[activation]
+def forwardprop_helper(A_prev, W, b, activation_func = relu):
     #computing Z and linear_cache for backprop
     Z = np.dot(W,A_prev) + b
     linear_cache = (A_prev, W, b)
@@ -30,10 +29,9 @@ def forwardprop(X, parameters, L, num_classes):
     #computing activations for hidden layers
     for l in range(1, L):
         A_prev = A
-        A, cache = forwardprop_helper(A_prev=A_prev,W=parameters['W' + str(l)],b=parameters['b' + str(l)],activation="relu")
+        A, cache = forwardprop_helper(A_prev=A_prev,W=parameters['W' + str(l)],b=parameters['b' + str(l)],activation_func=relu)
         caches.append(cache)
     #computing activations for output layer
-    act = "softmax" if num_classes > 2 else "sigmoid"
-    AL, cache = forwardprop_helper(A_prev=A,W=parameters['W' + str(L)],b=parameters['b' + str(L)],activation=act)
+    AL, cache = forwardprop_helper(A_prev=A,W=parameters['W' + str(L)],b=parameters['b' + str(L)],activation_func=sigmoid)
     caches.append(cache)
     return AL, caches

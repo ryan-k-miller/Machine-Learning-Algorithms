@@ -29,7 +29,7 @@ def initialize_parameters(layer_dims, init_strategy = 'xavier', random_state = 0
     return parameters
 
 #method for updating model parameters for all layers
-def update_parameters(parameters, grads, alpha, L):
+def update_parameters(parameters, grads, alpha, L, lmbda, m):
     """
         updating parameters based on the gradients derived during backprop
 
@@ -41,6 +41,6 @@ def update_parameters(parameters, grads, alpha, L):
             parameters: dictionary containing the updated weights and intercepts for each layer
     """
     for l in range(1,L+1):
-        parameters["W" + str(l)] -= alpha*grads["dW" + str(l)]
+        parameters["W" + str(l)] = parameters["W" + str(l)] * (1 - (alpha*lmbda)/m) - alpha*grads["dW" + str(l)]
         parameters["b" + str(l)] -= alpha*grads["db" + str(l)]
     return parameters

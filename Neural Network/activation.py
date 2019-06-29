@@ -11,13 +11,6 @@ def relu(Z):
     r = np.maximum(0,Z)
     return r , Z
 
-#Softmax method for computing activations for output layer in multiclass classification
-def softmax(Z):
-    exps = np.exp(Z - Z.max())
-    sum_exps = np.sum(exps)
-    s = exps/sum_exps
-    return s , Z
-
 #gradient of the sigmoid method for performing backpropagation
 def sigmoid_gradient(dA, Z):
     s,_ = sigmoid(Z)
@@ -29,7 +22,3 @@ def relu_gradient(dA, Z):
     dZ = np.array(dA,copy=True)
     dZ[Z <= 0] = 0
     return dZ
-
-#defining a dictionary containing the activation functions for forward prop and backprop
-activation_funcs = {'sigmoid':sigmoid, 'relu':relu, 'softmax':softmax}
-gradient_funcs = {'sigmoid':sigmoid_gradient, 'relu':relu_gradient}
