@@ -3,7 +3,6 @@ import numpy as np
 def mini_batch_setup(m, mini_batch_size):
     """
         function to determine the splits for mini-batch gradient descent
-
         if mini_batch_size == m, then performing batch gradient descent
 
         inputs:

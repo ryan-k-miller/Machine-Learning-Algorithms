@@ -5,12 +5,12 @@ def forwardprop_helper(A_prev, W, b, activation_func = relu):
     #computing Z and linear_cache for backprop
     Z = np.dot(W,A_prev) + b
     linear_cache = (A_prev, W, b)
-    #computing activations and activation_cache for use in backprop
+    #computing activations and activation_cache for backprop
     A, activation_cache = activation_func(Z)
     cache = (linear_cache, activation_cache)
     return A, cache
 
-def forwardprop(X, parameters, L, num_classes):
+def forwardprop(X, parameters, L):
     """
         wrapper function for computing activations for each layer
 

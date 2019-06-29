@@ -60,7 +60,7 @@ class NeuralNetwork:
         return cost
 
     def train_helper(self, X_batch, Y_batch, alpha, m):
-        AL, caches = forwardprop(X_batch, self.parameters, self.L, self.num_classes)
+        AL, caches = forwardprop(X_batch, self.parameters, self.L)
         grads = backprop(AL, Y_batch, caches, self.L)
         self.parameters = update_parameters(self.parameters, grads, alpha, self.L, self.lmbda, m)
         return AL
@@ -108,7 +108,7 @@ class NeuralNetwork:
                 Y_batch = Y[:,t*self.mini_batch_size:(t+1)*self.mini_batch_size]
                 AL = self.train_helper(X_batch, Y_batch, alpha, m)
                 #storing and outputing logloss for every 100 iterations
-                if (i*(num_complete_mb + (incomp_mb_size > 0)) + t + 1) % 100 == 0:
+                if (i*(num_complete_mb + (incomp_mb_size > 0)) + t + 1) % self.print_iter == 0:
                     cost = self.cost_multi(AL,Y_batch) if self.num_classes > 2 else self.cost_binary(AL,Y_batch)
                     self.costs.append(cost)
                     if self.print_errors:
@@ -135,7 +135,7 @@ class NeuralNetwork:
                     if multiclass classification: pred_prob.shape == (num_classes , num_examples)
                     if binary classification: pred_prob.shape == (1 , num_examples)
         """
-        pred_prob,_ = forwardprop(X, self.parameters, self.L, self.num_classes)
+        pred_prob,_ = forwardprop(X, self.parameters, self.L)
         return pred_prob
 
     def accuracy(self, X, Y):
@@ -145,6 +145,9 @@ class NeuralNetwork:
             input:
                 X: numpy array containing the examples as column vectors for prediction
                     X.shape == (num_features , num_examples)
+                Y: numpy array containing the training labels as column vectors
+                    if multiclass classification: Y.shape == (num_classes , num_examples)
+                    if binary classification: Y.shape == (1 , num_examples)
 
             output:
                 accuracy: float representing the accuracy of the current parameters
@@ -157,32 +160,15 @@ class NeuralNetwork:
         return 100*np.mean(pred == Y)
 
     def plot_cost(self):
-        """
-            method for plotting the training costs
-
-            input: None
-
-            output: None
-        """
+        """ method for plotting the training costs """
         plt.plot(np.squeeze(self.costs))
         plt.ylabel('Logloss')
-        plt.xlabel('Iterations (per 1000)')
+        plt.xlabel('Iterations (per %f)'%self.print_iter)
         plt.title("Learning rate =" + str(self.alpha))
         plt.show()
 
 
 if __name__ == "__main__":
-    import sys
-    #testing NeuralNetwork class using Diabetes dataset
-    # data = pd.read_csv("../../Data/Binary Classification/diabetes.csv",header=0)
-    # #shaping the data so the examples are stored in column vectors
-    # X = np.array(data.iloc[:,:-1]).T
-    # Y = data.iloc[:,-1].ravel().reshape((1,-1))
-    # nn = NeuralNetwork(alpha=0.01,epochs=5000,layer_dims=[20,20,10,10],
-    #                    decay_rate=0.001, mini_batch_size=X.shape[1]/5, init_strategy = "he",
-    #                    random_state=0, print_errors=True)
-    # nn.train(X, Y)
-
     #testing NeuralNetwork class using MNIST dataset
     train = pd.read_csv("../../Data/mnist_train.csv",header=0)
     test = pd.read_csv("../../Data/mnist_test.csv",header=0)
@@ -196,10 +182,10 @@ if __name__ == "__main__":
     X_test = X_test.T / 255
     Y_test = pd.get_dummies(test.iloc[:,0]).values.T
     #initializing, training, and evaluating the nn
-    nn = NeuralNetwork(alpha=0.5,epochs=10,layer_dims=[100,50,30,30], lmbda = 0.5,
-                       decay_rate=0.01, mini_batch_size=128, init_strategy = "xavier",
-                       random_state=7, print_errors=True)
+    nn = NeuralNetwork(alpha=0.1,epochs=10,layer_dims=[100,100,50,30,30], lmbda = 0.5,
+                       decay_rate=0.3, mini_batch_size=128, init_strategy = "xavier",
+                       random_state=0, print_errors=True)
     nn.train(X_train, Y_train)
     # nn.plot_cost()
 
-    print("Prediction Accuracy for Neural Network:",np.round(nn.accuracy(X_test,Y_test),3),'%')
+    print("Test Accuracy for Neural Network:",np.round(nn.accuracy(X_test,Y_test),3),'%')
