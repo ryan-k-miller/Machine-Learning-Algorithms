@@ -1,7 +1,7 @@
 # Machine-Learning-Algorithms
 Implementations of popular machine learning algorithms using Python, including:
-- Decision Tree
-- Random Forest (using bagging and information gain)
+- Decision Tree (using information gain)
+- Random Forest (using bagging and the above implementation of the Decision Tree algorithm)
 - Logistic Regression (using l2 regularization and gradient descent)
 - K-Means
 - Gaussian Mixture Model (using Expectation Maximization)
