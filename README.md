@@ -5,7 +5,7 @@ Implementations of popular machine learning algorithms using Python, including:
 - Logistic Regression (using l2 regularization and gradient descent)
 - K-Means
 - Gaussian Mixture Model (using Expectation Maximization)
-- Artificial Neural Network (with Fully Connected layers)
+- Artificial Neural Network (using Fully Connected layers)
   
 Each implementation, except for the ANN and clustering algorithms, includes a comparison to its sklearn equivalent using the Pima Indians Diabetes dataset. The clustering algorithms are used to segment the RGB values of an image, and the artificial neural network is trained and tested on the MNIST dataset.
 
