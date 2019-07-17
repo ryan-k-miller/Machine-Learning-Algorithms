@@ -23,7 +23,7 @@ class Diagnostics:
       self.SSR = None
       self.SST = None
       self.R_squared = None
-      R_squared_adjusted = None
+      self.R_squared_adjusted = None
       self.MSE = None
 
     def print_fit_attributes(self):
@@ -40,7 +40,7 @@ class Diagnostics:
         print("SSR:",self.SSR)
         print("SST:",self.SST)
         print("R-Squared",self.R_squared)
-        print("Adjusted R-Squared:",R_squared_adjusted)
+        print("Adjusted R-Squared:",self.R_squared_adjusted)
         print("MSE:",self.MSE)
 
     def residuals_fitted_plot(self):
@@ -65,10 +65,16 @@ class Diagnostics:
     def qq_plot(self):
         """
             method for creating a QQ plot to check for normality of errors
+
+            inputs:
+                None
+
+            outputs:
+                None
         """
         norm_res = self.residuals/np.linalg.norm(self.residuals)
         plt.title("Q-Q Plot")
-        probplot(x=norm_res,dist='norm')
+        probplot(x=np.squeeze(norm_res),dist='norm', plot=plt)
         plt.xlabel("Theoretical Quantiles")
         plt.ylabel("Standardized Residuals")
         plt.show()
@@ -76,11 +82,16 @@ class Diagnostics:
     def scale_location_plot(self):
         """
             method for creating a Scale-Location plot to check for Homoscedasticity
+
+            inputs:
+                None
+
+            outputs:
+                None
         """
         #plotting fitted vs sqrt of normalized residuals
         norm_res = self.residuals/np.linalg.norm(self.residuals)
         sqrt_res = np.sqrt(np.abs(norm_res))
-        print(self.fitted.shape)
         sns.residplot(np.squeeze(self.fitted),np.squeeze(sqrt_res),lowess=True,line_kws={'color': 'red'})
         #creating plot labels
         plt.ylabel("sqrt(Standardized Residuals)")
@@ -191,4 +202,4 @@ if __name__ == "__main__":
     lr_sk.fit(X,y)
     print("Sklearn's R-Squared",lr_sk.score(X,y))
 
-    lr.scale_location_plot()
+    lr.qq_plot()
