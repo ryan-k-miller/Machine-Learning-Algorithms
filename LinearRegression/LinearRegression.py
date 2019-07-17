@@ -35,15 +35,14 @@ class LinearRegression:
         p = X.shape[1]
         y_pred = np.dot(X,self.beta_hat)
         y_bar = y.mean()
-        self.residuals = y - y_pred
-        self.SSE = np.linalg.norm(self.residuals)**2
+        self.SSE = np.linalg.norm(y - y_pred)**2
         self.SSR = np.linalg.norm(y_pred-y_bar)**2
         self.SST = np.linalg.norm(y-y_bar)**2
         self.R_squared = self.SSR/self.SST
         self.R_squared_adjusted = 1 - (1 - self.R_squared)*(n-1)/(n-p-1)
 
     def __repr__(self):
-        return "Hello World!"
+        return "Hello!"
 
     def fit(self, X, y):
         """
@@ -61,10 +60,7 @@ class LinearRegression:
                                or (1, p+1) if fit_intercept = True
         """
         #adding intercept to predictor array based on hyperparameter
-        if self.fit_intercept == True:
-            X_reg = np.append(X,np.ones((X.shape[0],1)),axis=1)
-        else:
-            X_reg = X.copy()
+        X_reg = np.append(X,np.ones((X.shape[0],1)),axis=1) if self.fit_intercept else X.copy()
         #computing beta hat
         X2_inv = np.linalg.inv(np.dot(X_reg.T,X_reg))
         self.beta_hat = np.dot(X2_inv,np.dot(X_reg.T,y))
@@ -86,12 +82,34 @@ class LinearRegression:
                        shape = (n, 1) where n = # of observations
         """
         #adding intercept to predictor array based on hyperparameter
-        if self.fit_intercept == True:
-            X_reg = np.append(X,np.ones((X.shape[0],1)),axis=1)
-        else:
-            X_reg = X.copy()
+        X_reg = np.append(X,np.ones((X.shape[0],1)),axis=1) if self.fit_intercept else X.copy()
         #computing y hat
         return np.dot(X_reg,self.beta_hat)
+
+
+    def plot_fitted(self, X, y):
+        """
+            method for plotting the predictions against the true values
+            to check for homoscedasticity
+
+            inputs:
+                X: numpy array containing the predictor variables
+                   shape = (n, p) where n = # of observations and p = # of predictors
+                y: numpy array containing the response variable
+                   shape = (n, 1) where n = # of observations
+
+            outputs:
+                None
+        """
+        X_reg = np.append(X,np.ones((X.shape[0],1)),axis=1) if self.fit_intercept else X.copy()
+        #plotting fitted vs true
+        plt.scatter(y,np.dot(X_reg,self.beta_hat))
+        #creating reference line
+        plt.plot(y,y,c="black")
+        plt.ylabel("True Values")
+        plt.xlabel("Predicted Values")
+        plt.title("True vs Fitted Values")
+        plt.show()
 
 
 
