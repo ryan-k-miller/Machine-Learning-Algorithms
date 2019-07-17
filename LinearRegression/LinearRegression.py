@@ -54,16 +54,12 @@ class Diagnostics:
             outputs:
                 None
         """
-        #plotting fitted vs normalized residuals
-        norm_res = self.residuals/np.linalg.norm(self.residuals)
-        sns.residplot(self.fitted,norm_res)
-        #plt.scatter(self.fitted,norm_res)
-        #creating reference line
-        #plt.plot(y,y,c="black")
+        #plotting fitted vs residuals
+        sns.residplot(np.squeeze(self.fitted),np.squeeze(self.residuals),lowess=True,line_kws={'color': 'red'})
         #creating plot labels
-        plt.ylabel("True Values")
-        plt.xlabel("Predicted Values")
-        plt.title("True vs Fitted Values")
+        plt.ylabel("Residuals")
+        plt.xlabel("Fitted")
+        plt.title("Residuals vs Fitted Values")
         plt.show()
 
     def qq_plot(self):
@@ -72,7 +68,7 @@ class Diagnostics:
         """
         norm_res = self.residuals/np.linalg.norm(self.residuals)
         plt.title("Q-Q Plot")
-        probplot(norm_res,dist='norm',plot=plt)
+        probplot(x=norm_res,dist='norm')
         plt.xlabel("Theoretical Quantiles")
         plt.ylabel("Standardized Residuals")
         plt.show()
@@ -81,7 +77,16 @@ class Diagnostics:
         """
             method for creating a Scale-Location plot to check for Homoscedasticity
         """
-
+        #plotting fitted vs sqrt of normalized residuals
+        norm_res = self.residuals/np.linalg.norm(self.residuals)
+        sqrt_res = np.sqrt(np.abs(norm_res))
+        print(self.fitted.shape)
+        sns.residplot(np.squeeze(self.fitted),np.squeeze(sqrt_res),lowess=True,line_kws={'color': 'red'})
+        #creating plot labels
+        plt.ylabel("sqrt(Standardized Residuals)")
+        plt.xlabel("Fitted")
+        plt.title("Scale-Location Plot")
+        plt.show()
 
 
 class LinearRegression(Diagnostics):
@@ -186,4 +191,4 @@ if __name__ == "__main__":
     lr_sk.fit(X,y)
     print("Sklearn's R-Squared",lr_sk.score(X,y))
 
-    lr.residuals_fitted_plot()
+    lr.scale_location_plot()
