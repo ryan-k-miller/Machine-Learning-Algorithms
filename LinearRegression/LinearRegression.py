@@ -1,8 +1,72 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.stats import probplot
 
-class LinearRegression:
+class Diagnostics:
+    """
+        class for checking the model fit and assumptions for Linear Regression
+
+        inputs:
+            None
+        outputs:
+            None
+    """
+    def __init__(self):
+      self.SSE = None
+      self.SSR = None
+      self.SST = None
+      self.R_squared = None
+      R_squared_adjusted = None
+      self.MSE = None
+
+    def print_fit_attributes(self):
+        """
+            method for printing SSE, SSR, SST, R_squared, R_squared_adjusted, and MSE
+
+            inputs:
+                None
+
+            outputs:
+                None
+        """
+        print("SSE:",self.SSE)
+        print("SSR:",self.SSR)
+        print("SST:",self.SST)
+        print("R-Squared",self.R_squared)
+        print("Adjusted R-Squared:",R_squared_adjusted)
+        print("MSE:",self.MSE)
+
+    def plot_fitted(self, X, y):
+        """
+            method for plotting the predictions against the true values
+            to check for homoscedasticity
+
+            inputs:
+                X: numpy array containing the predictor variables
+                   shape = (n, p) where n = # of observations and p = # of predictors
+                y: numpy array containing the response variable
+                   shape = (n, 1) where n = # of observations
+
+            outputs:
+                None
+        """
+        X_reg = np.append(X,np.ones((X.shape[0],1)),axis=1) if self.fit_intercept else X.copy()
+        #plotting fitted vs true
+        plt.scatter(y,np.dot(X_reg,self.beta_hat))
+        #creating reference line
+        plt.plot(y,y,c="black")
+        #creating plot labels
+        plt.ylabel("True Values")
+        plt.xlabel("Predicted Values")
+        plt.title("True vs Fitted Values")
+        plt.show()
+
+    def qqplot(self):
+
+
+
+class LinearRegression(Diagnostics):
     """
         Linear Regression class with methods for fitting to a training dataset,
         predicting based on a testing dataset, and checking model assumptions
@@ -19,7 +83,7 @@ class LinearRegression:
 
     def compute_fit_attributes(self, X, y):
         """
-            helper method for creating attributes SSE, SSR, SST, R_squared, R_squared_adjusted, and residuals
+            helper method for creating attributes SSE, SSR, SST, R_squared, R_squared_adjusted, and MSE
 
             inputs:
                 X: numpy array containing the predictor variables
@@ -40,9 +104,13 @@ class LinearRegression:
         self.SST = np.linalg.norm(y-y_bar)**2
         self.R_squared = self.SSR/self.SST
         self.R_squared_adjusted = 1 - (1 - self.R_squared)*(n-1)/(n-p-1)
+        self.MSE = self.SSE/n
+        self.residuals = y - y_pred
+        self.fitted = y_pred
 
     def __repr__(self):
-        return "Hello!"
+        return "Linear Regression class with methods for fitting to a training dataset,"
+                + " predicting based on a testing dataset, and checking model assumptions"
 
     def fit(self, X, y):
         """
@@ -85,31 +153,6 @@ class LinearRegression:
         X_reg = np.append(X,np.ones((X.shape[0],1)),axis=1) if self.fit_intercept else X.copy()
         #computing y hat
         return np.dot(X_reg,self.beta_hat)
-
-
-    def plot_fitted(self, X, y):
-        """
-            method for plotting the predictions against the true values
-            to check for homoscedasticity
-
-            inputs:
-                X: numpy array containing the predictor variables
-                   shape = (n, p) where n = # of observations and p = # of predictors
-                y: numpy array containing the response variable
-                   shape = (n, 1) where n = # of observations
-
-            outputs:
-                None
-        """
-        X_reg = np.append(X,np.ones((X.shape[0],1)),axis=1) if self.fit_intercept else X.copy()
-        #plotting fitted vs true
-        plt.scatter(y,np.dot(X_reg,self.beta_hat))
-        #creating reference line
-        plt.plot(y,y,c="black")
-        plt.ylabel("True Values")
-        plt.xlabel("Predicted Values")
-        plt.title("True vs Fitted Values")
-        plt.show()
 
 
 
