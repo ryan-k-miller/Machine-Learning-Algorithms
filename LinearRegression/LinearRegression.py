@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import probplot
+import seaborn as sns
 
 class Diagnostics:
     """
@@ -12,6 +13,11 @@ class Diagnostics:
         outputs:
             None
     """
+
+    #reference for checking assumptions: https://data.library.virginia.edu/diagnostic-plots/
+    #Stat 420 Book: https://daviddalpiaz.github.io/appliedstats/
+
+
     def __init__(self):
       self.SSE = None
       self.SSR = None
@@ -37,32 +43,44 @@ class Diagnostics:
         print("Adjusted R-Squared:",R_squared_adjusted)
         print("MSE:",self.MSE)
 
-    def plot_fitted(self, X, y):
+    def residuals_fitted_plot(self):
         """
-            method for plotting the predictions against the true values
-            to check for homoscedasticity
+            method for plotting the predictions against the residuals to check
+            if there is a linear relationship between the response and predictors
 
             inputs:
-                X: numpy array containing the predictor variables
-                   shape = (n, p) where n = # of observations and p = # of predictors
-                y: numpy array containing the response variable
-                   shape = (n, 1) where n = # of observations
+                None
 
             outputs:
                 None
         """
-        X_reg = np.append(X,np.ones((X.shape[0],1)),axis=1) if self.fit_intercept else X.copy()
-        #plotting fitted vs true
-        plt.scatter(y,np.dot(X_reg,self.beta_hat))
+        #plotting fitted vs normalized residuals
+        norm_res = self.residuals/np.linalg.norm(self.residuals)
+        sns.residplot(self.fitted,norm_res)
+        #plt.scatter(self.fitted,norm_res)
         #creating reference line
-        plt.plot(y,y,c="black")
+        #plt.plot(y,y,c="black")
         #creating plot labels
         plt.ylabel("True Values")
         plt.xlabel("Predicted Values")
         plt.title("True vs Fitted Values")
         plt.show()
 
-    def qqplot(self):
+    def qq_plot(self):
+        """
+            method for creating a QQ plot to check for normality of errors
+        """
+        norm_res = self.residuals/np.linalg.norm(self.residuals)
+        plt.title("Q-Q Plot")
+        probplot(norm_res,dist='norm',plot=plt)
+        plt.xlabel("Theoretical Quantiles")
+        plt.ylabel("Standardized Residuals")
+        plt.show()
+
+    def scale_location_plot(self):
+        """
+            method for creating a Scale-Location plot to check for Homoscedasticity
+        """
 
 
 
@@ -109,8 +127,8 @@ class LinearRegression(Diagnostics):
         self.fitted = y_pred
 
     def __repr__(self):
-        return "Linear Regression class with methods for fitting to a training dataset,"
-                + " predicting based on a testing dataset, and checking model assumptions"
+        desc = self.__doc__
+        return desc
 
     def fit(self, X, y):
         """
@@ -167,3 +185,5 @@ if __name__ == "__main__":
     lr_sk = linear_model.LinearRegression()
     lr_sk.fit(X,y)
     print("Sklearn's R-Squared",lr_sk.score(X,y))
+
+    lr.residuals_fitted_plot()
