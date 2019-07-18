@@ -30,8 +30,10 @@ class NeuralNetwork:
                            takes the value of "xavier" or "he"
             decay_rate: float representing the decay rate for learning rate decay
             mini_batch_size: int representing the size of each mini-batch
-                             if mini_batch_size == num_examples, then performing batch gradient descent
-            epsilon: float representing the adjustment value to avoid numerical instability (divide by 0)
+                             if mini_batch_size == num_examples, then performing batch
+                             gradient descent
+            epsilon: float representing the adjustment value to avoid numerical instability
+                     (divide by 0)
             random_state: int for setting the np.random.seed to ensure reproducibility
             print_errors: boolean flag representing whether or not to print the cost during training
             print_iter: the number of iterations between printing the current training cost
