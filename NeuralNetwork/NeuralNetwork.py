@@ -1,12 +1,20 @@
 #importing dependencies
 import numpy as np
+from sklearn.preprocessing import normalize
+import matplotlib.pyplot as plt
+import pandas as pd
+
+#adding location of helper modules to path when run in the jupyter notebook
+if __name__ != "__main__":
+    import os
+    import sys
+    sys.path.append(os.getcwd() + "/NeuralNetwork/")
+
 from forwardprop import *
 from backprop import *
 from parameters import *
 from mini_batch import *
-from sklearn.preprocessing import normalize
-import matplotlib.pyplot as plt
-import pandas as pd
+
 
 class NeuralNetwork:
     """
