@@ -43,6 +43,20 @@ class NeuralNetwork:
     def __init__(self, layer_dims=[4,4,4], alpha=0.01, epochs=100, lmbda = 0.0,
                  init_strategy="Xavier",decay_rate=0.001, mini_batch_size=64,
                  epsilon=10**-8, random_state=0, print_errors=True, print_iter = 100):
+        #validating types of inputs
+        assert isinstance(layer_dims,list)
+        assert isinstance(alpha,float)
+        assert isinstance(epochs,int)
+        assert isinstance(lmbda,float)
+        assert isinstance(init_strategy,str)
+        assert isinstance(decay_rate,float)
+        assert isinstance(mini_batch_size,int)
+        assert isinstance(epsilon,float)
+        assert isinstance(random_state,int)
+        assert isinstance(print_errors,bool)
+        assert isinstance(print_iter,int)
+
+        #assigning inputs as atrtibutes of the class
         self.layer_dims = layer_dims
         self.alpha = alpha
         self.epochs = int(epochs)
@@ -96,11 +110,9 @@ class NeuralNetwork:
         #storing input and output layer dimensions
         self.layer_dims.insert(0,X.shape[0])
         self.num_classes = Y.shape[0]
-        # out_dim =
-        if self.num_classes > 2:
-            self.layer_dims.append(self.num_classes)  #for multiclass classification
-        else:
-            self.layer_dims.append(1)  #only doing binary classification
+        out_dim = self.num_classes if self.num_classes > 2 else 1
+        self.layer_dims.append(out_dim)
+        #determining mini batch sizes
         m = X.shape[1]
         num_complete_mb,incomp_mb_size = mini_batch_setup(m,self.mini_batch_size)
         #printing descriptions of the training architecture
