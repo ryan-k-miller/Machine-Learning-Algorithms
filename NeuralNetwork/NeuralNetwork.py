@@ -40,13 +40,12 @@ class NeuralNetwork:
 
         output: None
     """
-    def __init__(self, layer_dims=[4,4,4], alpha=0.01, epochs=100, lmbda = 0.0,
+    def __init__(self, layer_dims=[4,4,4], alpha=0.01, lmbda = 0.0,
                  init_strategy="Xavier",decay_rate=0.001, mini_batch_size=64,
                  epsilon=10**-8, random_state=0, print_errors=True, print_iter = 100):
         #validating types of inputs
         assert isinstance(layer_dims,list)
         assert isinstance(alpha,float)
-        assert isinstance(epochs,int)
         assert isinstance(lmbda,float)
         assert isinstance(init_strategy,str)
         assert isinstance(decay_rate,float)
@@ -59,7 +58,6 @@ class NeuralNetwork:
         #assigning inputs as atrtibutes of the class
         self.layer_dims = layer_dims
         self.alpha = alpha
-        self.epochs = int(epochs)
         self.random_state = int(random_state)
         self.print_errors = print_errors
         self.L = len(layer_dims) + 1
@@ -89,7 +87,7 @@ class NeuralNetwork:
         self.parameters = update_parameters(self.parameters, grads, alpha, self.L, self.lmbda, m)
         return AL
 
-    def train(self, X, Y):
+    def train(self, X, Y, epochs=100):
         """
             method for training the Neural Network based on the hyperparameters
             selected during initialization
@@ -106,6 +104,11 @@ class NeuralNetwork:
             output:
                 None
         """
+        #checking to see if number of observations in X and Y match
+        assert X.shape[1] == Y.shape[1]
+        #checking if epochs is an int
+        assert isinstance(epochs,int)
+
         self.costs = []
         #storing input and output layer dimensions
         self.layer_dims.insert(0,X.shape[0])
@@ -123,7 +126,7 @@ class NeuralNetwork:
         print("Number of Mini-Batches",num_complete_mb + (incomp_mb_size > 0))
         #training the NN with forward and back propagation
         self.parameters = initialize_parameters(self.layer_dims, init_strategy=self.init_strategy)
-        for i in range(0, self.epochs):
+        for i in range(0, epochs):
             alpha = self.alpha/(1+self.decay_rate*i)
             for t in range(num_complete_mb):
                 X_batch = X[:,t*self.mini_batch_size:(t+1)*self.mini_batch_size]
@@ -204,10 +207,10 @@ if __name__ == "__main__":
     X_test = X_test.T / 255
     Y_test = pd.get_dummies(test.iloc[:,0]).values.T
     #initializing, training, and evaluating the nn
-    nn = NeuralNetwork(alpha=0.1,epochs=10,layer_dims=[100,100,50,30,30], lmbda = 0.5,
+    nn = NeuralNetwork(alpha=0.1,layer_dims=[100,100,50,30,30], lmbda = 0.5,
                        decay_rate=0.3, mini_batch_size=128, init_strategy = "xavier",
                        random_state=0, print_errors=True)
-    nn.train(X_train, Y_train)
+    nn.train(X_train, Y_train,epochs=4)
     # nn.plot_cost()
 
     print("Test Accuracy for Neural Network:",np.round(nn.accuracy(X_test,Y_test),3),'%')
