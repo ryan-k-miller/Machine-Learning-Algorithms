@@ -87,7 +87,7 @@ class NeuralNetwork:
         self.parameters = update_parameters(self.parameters, grads, alpha, self.L, self.lmbda, m)
         return AL
 
-    def train(self, X, Y, epochs=100):
+    def train(self, X, Y, epochs=100, retrain = False):
         """
             method for training the Neural Network based on the hyperparameters
             selected during initialization
@@ -124,8 +124,10 @@ class NeuralNetwork:
         print("Number of Layers",len(self.layer_dims))
         print("Layer Dimensions:",self.layer_dims)
         print("Number of Mini-Batches",num_complete_mb + (incomp_mb_size > 0))
+        #if retrain is True, then use current parameters
+        if retrain == False:
+            self.parameters = initialize_parameters(self.layer_dims, init_strategy=self.init_strategy)
         #training the NN with forward and back propagation
-        self.parameters = initialize_parameters(self.layer_dims, init_strategy=self.init_strategy)
         for i in range(0, epochs):
             alpha = self.alpha/(1+self.decay_rate*i)
             for t in range(num_complete_mb):
