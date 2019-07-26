@@ -197,22 +197,21 @@ class NeuralNetwork:
 
 if __name__ == "__main__":
     #testing NeuralNetwork class using MNIST dataset
-    train = pd.read_csv("../../Data/mnist_train.csv",header=0)
-    test = pd.read_csv("../../Data/mnist_test.csv",header=0)
-    #shaping and preprocessing the data
-    X_train = train.iloc[:,1:].values
-    X_train = X_train.astype(np.float16)
+    from tensorflow.keras.datasets import mnist
+    (X_train,Y_train), (X_test,Y_test) = mnist.load_data()
+    X_train = X_train.astype(np.float16).reshape((-1,X_train.shape[1]*X_train.shape[2]))
     X_train = X_train.T / 255
-    Y_train = pd.get_dummies(train.iloc[:,0]).values.T
-    X_test = test.iloc[:,1:].values
-    X_test = X_test.astype(np.float16)
+    Y_train = pd.get_dummies(Y_train).values.T
+    # X_test = test.iloc[:,1:].values
+    X_test = X_test.astype(np.float16).reshape((-1,X_test.shape[1]*X_test.shape[2]))
     X_test = X_test.T / 255
-    Y_test = pd.get_dummies(test.iloc[:,0]).values.T
+    Y_test = pd.get_dummies(Y_test).values.T
+    X_train.shape
     #initializing, training, and evaluating the nn
     nn = NeuralNetwork(alpha=0.1,layer_dims=[100,100,50,30,30], lmbda = 0.5,
                        decay_rate=0.3, mini_batch_size=128, init_strategy = "xavier",
                        random_state=0, print_errors=True)
-    nn.train(X_train, Y_train,epochs=4)
+    nn.train(X_train, Y_train,epochs=5)
     # nn.plot_cost()
 
     print("Test Accuracy for Neural Network:",np.round(nn.accuracy(X_test,Y_test),3),'%')
