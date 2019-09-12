@@ -2,7 +2,7 @@ import numpy as np
 
 class TreeLearner(object):
     """
-        Super class for Decision and Random Tree Learners
+        Superclass for Decision and Random Tree Learners
     """
     def __init__(self, leaf_size = 1, verbose = False):
         self.leaf_size = leaf_size
@@ -77,7 +77,7 @@ class TreeLearner(object):
             return np.append(root, np.append(left_tree, right_tree))
 
 
-    def addEvidence(self, X, Y):
+    def fit(self, X, Y):
         """
             wrapper method for learning splits for Decision Tree Regressor
 
@@ -101,7 +101,7 @@ class TreeLearner(object):
         return self.tree[depth,1]
 
     #classifying a set of observations
-    def query(self, X):
+    def predict(self, X):
         """
             wrapper method for classifying new data using learned splits
 
