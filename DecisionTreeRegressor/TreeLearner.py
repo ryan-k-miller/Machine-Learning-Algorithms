@@ -1,58 +1,114 @@
-"""
-A simple wrapper for linear regression.  (c) 2015 Tucker Balch
-
-Copyright 2018, Georgia Institute of Technology (Georgia Tech)
-Atlanta, Georgia 30332
-All Rights Reserved
-
-Template code for CS 4646/7646
-
-Georgia Tech asserts copyright ownership of this template and all derivative
-works, including solutions to the projects assigned in this course. Students
-and other users of this template code are advised not to share it with others
-or to make it available on publicly viewable websites including repositories
-such as github and gitlab.  This copyright statement should not be removed
-or edited.
-
-We do grant permission to share solutions privately with non-students such
-as potential employers. However, sharing with other current or future
-students of CS 7646 is prohibited and subject to being investigated as a
-GT honor code violation.
-
------do not edit anything above this line---
-"""
-
 import numpy as np
 
-class LinRegLearner(object):
+class TreeLearner(object):
+    """
+        Super class for Decision and Random Tree Learners
+    """
+    def __init__(self, leaf_size = 1, verbose = False):
+        self.leaf_size = leaf_size
+        self.verbose = verbose
+        self.tree = np.array([np.nan]*4)
 
-    def __init__(self, verbose = False):
-        pass # move along, these aren't the drones you're looking for
-
-    def author(self):
-        return 'rmiller327'  		   	  			  	 		  		  		    	 		 		   		 		  
-
-    def addEvidence(self,dataX,dataY):
+    def find_split(self, X, Y):
         """
-        @summary: Add training data to learner
-        @param dataX: X values of data to add
-        @param dataY: the Y training values
+            helper method for the addEvidence method
+            to be defined by subclasses
         """
+        pass
 
-        # slap on 1s column so linear regression finds a constant term
-        newdataX = np.ones([dataX.shape[0],dataX.shape[1]+1])
-        newdataX[:,0:dataX.shape[1]]=dataX
-
-        # build and save the model
-        self.model_coefs, residuals, rank, s = np.linalg.lstsq(newdataX, dataY, rcond=None)
-
-    def query(self,points):
+    def split_tree(self, X, Y, split_col, split_val):
         """
-        @summary: Estimate a set of test points given the model we built.
-        @param points: should be a numpy array with each row corresponding to a specific query.
-        @returns the estimated values according to the saved model.
-        """
-        return (self.model_coefs[:-1] * points).sum(axis = 1) + self.model_coefs[-1]
+            helper method for the addEvidence method
+            splits X and Y based on the split_col and split_val
 
-if __name__=="__main__":
-    print("the secret clue is 'zzyzx'")
+            inputs:
+                X: numpy array containing the features
+                Y: numpy array containing the response
+                split_col: integer representing the column of X to split on
+                split_val: float representing the value to split split_col on
+
+            outputs:
+                X_left: numpy array containing the features with observations where
+                        the split_col is below the split_val
+                X_left: numpy array containing the features with observations where
+                        the split_col is above the split_val
+                Y_left: numpy array containing the response with observations
+                        corresponding to X_left
+                Y_left: numpy array containing the response with observations
+                        corresponding to X_right
+        """
+        split_mask = X[:,split_col] <= split_val
+        X_left = X[split_mask,:]
+        Y_left = Y[split_mask]
+        X_right = X[~split_mask,:]
+        Y_right = Y[~split_mask]
+        return (X_left, X_right, Y_left, Y_right)
+
+    def build_tree(self, X, Y):
+        """
+            recursive method for learning splits for Decision Tree Regressor
+
+            inputs:
+                Xtrain: numpy array of shape (m,N) containing the features
+                Ytrain: numpy array of shape (m,) containing the response
+
+            output: None
+        """
+        #checking stopping conditions (y only has one unique response value)
+        if Y.shape[0] <= self.leaf_size or len(np.unique(Y)) == 1:
+            return np.array([np.nan, np.mean(Y), np.nan, np.nan])
+        else:
+            #selecting split attribute that gives max information gain
+            split_col,split_val = self.find_split(X,Y)
+
+            #splitting data based on best split attribute
+            (X_left, X_right, Y_left, Y_right) = self.split_tree(X, Y, \
+                                                           split_col, split_val)
+
+            #checking if data didn't split (0 obs in left or right datasets)
+            if Y_left.shape[0] == 0 or Y_right.shape[0] == 0:
+                return np.array([np.nan, np.mean(Y), np.nan, np.nan])
+
+            #recursively training child nodes
+            left_tree = self.build_tree(X_left,Y_left)
+            right_tree = self.build_tree(X_right,Y_right)
+            root = np.array([split_col,split_val,1,int(left_tree.shape[0]/4)+1])
+
+            return np.append(root, np.append(left_tree, right_tree))
+
+
+    def addEvidence(self, X, Y):
+        """
+            wrapper method for learning splits for Decision Tree Regressor
+
+            inputs:
+                Xtrain: numpy array of shape (m,N) containing the features
+                Ytrain: numpy array of shape (m,) containing the response
+
+            output: None
+        """
+        self.tree = self.build_tree(X, Y).reshape((-1,4))
+
+    #classifying one observation using trained tree
+    def query_one(self, record):
+        depth = 0
+        while ~np.isnan(self.tree[depth,0]):
+            #deciding split direction (record[split_col] <= split_val)
+            if record[int(self.tree[depth,0])] <= self.tree[depth,1]:
+                depth+=int(self.tree[depth,2])
+            else:
+                depth+=int(self.tree[depth,3])
+        return self.tree[depth,1]
+
+    #classifying a set of observations
+    def query(self, X):
+        """
+            wrapper method for classifying new data using learned splits
+
+            input:
+                X: numpy array containing the features
+
+            output:
+                pred: numpy array containing the predictions for X
+        """
+        return np.array([self.query_one(i) for i in X])

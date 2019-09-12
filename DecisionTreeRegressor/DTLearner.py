@@ -1,7 +1,3 @@
-"""
-author: rmiller327
-"""
-
 import numpy as np
 
 class DTLearner():
@@ -12,9 +8,6 @@ class DTLearner():
         self.leaf_size = leaf_size
         self.verbose = verbose
         self.tree = np.array([np.nan]*4)
-
-    def author(self):
-        return 'rmiller327'
 
     def find_split(self, X, Y):
         """
